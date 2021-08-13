@@ -256,15 +256,24 @@ public class ImagePickerModule extends ReactContextBaseJavaModule
     int requestCode;
     Intent cameraIntent;
 
-    if (pickVideo)
+    if (pickVideo || pickBoth)
     {
       requestCode = REQUEST_LAUNCH_VIDEO_CAPTURE;
-      cameraIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-      cameraIntent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, videoQuality);
+      Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+      takeVideoIntent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, videoQuality);
       if (videoDurationLimit > 0)
       {
-        cameraIntent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, videoDurationLimit);
+        takeVideoIntent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, videoDurationLimit);
       }
+
+      if (pickBoth) {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        cameraIntent = Intent.createChooser(takePictureIntent, "Видео или фото");
+        cameraIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{takeVideoIntent});
+      } else {
+        cameraIntent = takeVideoIntent;
+      }
+      
     }
     else
     {
